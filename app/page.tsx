@@ -1,95 +1,50 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+"use client";
 
+import "./page.module.css";
+import celebrities from "@/celebrities.json";
+import { Box, TextField } from "@mui/material";
+import UserAccordian from "@/Components/UserAccordian";
+import { ChangeEvent, useEffect, useState } from "react";
+import { Celebrity_Details } from "@/Components/UserAccordian/userAccourdian.types";
+import useDebounce from "./hooks/useDebounce";
 export default function Home() {
+  const [searchText, setSearchText] = useState("");
+  const [celebritiesData, setCelebritiesData] = useState(celebrities);
+  const [expanded, setExpanded] = useState<number | false>(false);
+  const [editMode, setEditMode] = useState<boolean>(false);
+
+  const updateCelebrityDetails = (updatedCelebrity: Celebrity_Details) =>
+    setCelebritiesData((prev) =>
+      prev.map((celebrity) => {
+        if (celebrity.id === updatedCelebrity.id) {
+          return { ...updatedCelebrity, id: celebrity.id };
+        }
+        return celebrity;
+      })
+    );
+
+  const deleteCelebrityDetails = (id: number) =>
+    setCelebritiesData((prev) =>
+      prev.filter((celebrity) => celebrity.id !== id)
+    );
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+    <Box display="flex" flexDirection="column" alignItems="center" width="100%">
+      {celebritiesData.map((celebrity, i) => (
+        <Box mt={2} width={"320px"} key={i}>
+          <UserAccordian
+            {...{
+              ...celebrity,
+              expanded,
+              setExpanded,
+              editMode,
+              setEditMode,
+              updateCelebrityDetails,
+              deleteCelebrityDetails,
+            }}
+          />
+        </Box>
+      ))}
+    </Box>
+  );
 }
